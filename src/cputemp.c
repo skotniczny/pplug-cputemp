@@ -1,5 +1,5 @@
 /*============================================================================
-Copyright (c) 2018-2025 Raspberry Pi Holdings Ltd.
+Copyright (c) 2018-2025 Raspberry Pi
 All rights reserved.
 
 Some code taken from the lxpanel project
@@ -66,6 +66,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*----------------------------------------------------------------------------*/
 /* Global data                                                                */
 /*----------------------------------------------------------------------------*/
+
+conf_table_t conf_table[7] = {
+    {CONF_TYPE_COLOUR,   "foreground",   N_("Foreground colour"),               NULL},
+    {CONF_TYPE_COLOUR,   "background",   N_("Background colour"),               NULL},
+    {CONF_TYPE_COLOUR,   "throttle_1",   N_("Colour when ARM frequency capped"),NULL},
+    {CONF_TYPE_COLOUR,   "throttle_2",   N_("Colour when throttled"),           NULL},
+    {CONF_TYPE_INT,      "low_temp",     N_("Lower temperature bound"),         NULL},
+    {CONF_TYPE_INT,      "high_temp",    N_("Upper temperature bound"),         NULL},
+    {CONF_TYPE_NONE,     NULL,           NULL,                                  NULL}
+};
 
 /*----------------------------------------------------------------------------*/
 /* Prototypes                                                                 */
@@ -454,8 +464,6 @@ void cputemp_destructor (gpointer user_data)
 /* Constructor */
 static GtkWidget *cpu_constructor (LXPanel *panel, config_setting_t *settings)
 {
-    const char *str;
-
     /* Allocate and initialize plugin context */
     CPUTempPlugin *c = g_new0 (CPUTempPlugin, 1);
 
@@ -465,33 +473,22 @@ static GtkWidget *cpu_constructor (LXPanel *panel, config_setting_t *settings)
     c->plugin = gtk_event_box_new ();
     lxpanel_plugin_set_data (c->plugin, c, cputemp_destructor);
 
+    /* Set config defaults */
+    gdk_rgba_parse (&c->foreground_colour, "dark gray");
+    gdk_rgba_parse (&c->background_colour, "light gray");
+    gdk_rgba_parse (&c->low_throttle_colour, "orange");
+    gdk_rgba_parse (&c->high_throttle_colour, "red");
+    c->lower_temp = 40;
+    c->upper_temp = 90;
+
     /* Read config */
-    if (!config_setting_lookup_int (c->settings, "LowTemp", &c->lower_temp)) c->lower_temp = 40;
-    if (!config_setting_lookup_int (c->settings, "HighTemp", &c->upper_temp)) c->upper_temp = 90;
-
-    if (config_setting_lookup_string (c->settings, "Foreground", &str))
-    {
-        if (!gdk_rgba_parse (&c->foreground_colour, str))
-            gdk_rgba_parse (&c->foreground_colour, "dark gray");
-    } else gdk_rgba_parse (&c->foreground_colour, "dark gray");
-
-    if (config_setting_lookup_string (c->settings, "Background", &str))
-    {
-        if (!gdk_rgba_parse (&c->background_colour, str))
-            gdk_rgba_parse (&c->background_colour, "light gray");
-    } else gdk_rgba_parse (&c->background_colour, "light gray");
-
-    if (config_setting_lookup_string (c->settings, "Throttle1", &str))
-    {
-        if (!gdk_rgba_parse (&c->low_throttle_colour, str))
-            gdk_rgba_parse (&c->low_throttle_colour, "orange");
-    } else gdk_rgba_parse (&c->low_throttle_colour, "orange");
-
-    if (config_setting_lookup_string (c->settings, "Throttle2", &str))
-    {
-        if (!gdk_rgba_parse (&c->high_throttle_colour, str))
-            gdk_rgba_parse (&c->high_throttle_colour, "red");
-    } else gdk_rgba_parse (&c->high_throttle_colour, "red");
+    conf_table[0].value = (void *) &c->foreground_colour;
+    conf_table[1].value = (void *) &c->background_colour;
+    conf_table[2].value = (void *) &c->low_throttle_colour;
+    conf_table[3].value = (void *) &c->high_throttle_colour;
+    conf_table[4].value = (void *) &c->lower_temp;
+    conf_table[5].value = (void *) &c->upper_temp;
+    lxplug_read_settings (c->settings, conf_table);
 
     cputemp_init (c);
 
@@ -509,20 +506,10 @@ static void cpu_configuration_changed (LXPanel *, GtkWidget *plugin)
 static gboolean cpu_apply_configuration (gpointer user_data)
 {
     CPUTempPlugin *c = lxpanel_plugin_get_data (GTK_WIDGET (user_data));
-    char colbuf[32];
 
     validate_temps (c);
 
-    sprintf (colbuf, "%s", gdk_rgba_to_string (&c->foreground_colour));
-    config_group_set_string (c->settings, "Foreground", colbuf);
-    sprintf (colbuf, "%s", gdk_rgba_to_string (&c->background_colour));
-    config_group_set_string (c->settings, "Background", colbuf);
-    sprintf (colbuf, "%s", gdk_rgba_to_string (&c->low_throttle_colour));
-    config_group_set_string (c->settings, "Throttle1", colbuf);
-    sprintf (colbuf, "%s", gdk_rgba_to_string (&c->high_throttle_colour));
-    config_group_set_string (c->settings, "Throttle2", colbuf);
-    config_group_set_int (c->settings, "HighTemp", c->upper_temp);
-    config_group_set_int (c->settings, "LowTemp", c->lower_temp);
+    lxplug_write_settings (c->settings, conf_table);
 
     cputemp_update_display (c);
     return FALSE;
@@ -531,24 +518,16 @@ static gboolean cpu_apply_configuration (gpointer user_data)
 /* Display configuration dialog */
 static GtkWidget *cpu_configure (LXPanel *panel, GtkWidget *plugin)
 {
-    CPUTempPlugin *c = lxpanel_plugin_get_data (plugin);
-
-    return lxpanel_generic_config_dlg(_("CPU Temperature"), panel,
+    return lxpanel_generic_config_dlg_new (_(PLUGIN_TITLE), panel,
         cpu_apply_configuration, plugin,
-        _("Foreground colour"), &c->foreground_colour, CONF_TYPE_COLOR,
-        _("Background colour"), &c->background_colour, CONF_TYPE_COLOR,
-        _("Colour when ARM frequency capped"), &c->low_throttle_colour, CONF_TYPE_COLOR,
-        _("Colour when throttled"), &c->high_throttle_colour, CONF_TYPE_COLOR,
-        _("Lower temperature bound"), &c->lower_temp, CONF_TYPE_INT,
-        _("Upper temperature bound"), &c->upper_temp, CONF_TYPE_INT,
-        NULL);
+        conf_table);
 }
 
 FM_DEFINE_MODULE (lxpanel_gtk, cputemp)
 
 /* Plugin descriptor */
 LXPanelPluginInit fm_module_init_lxpanel_gtk = {
-    .name = N_("CPU Temperature Monitor"),
+    .name = N_(PLUGIN_TITLE),
     .config = cpu_configure,
     .description = N_("Display CPU temperature"),
     .new_instance = cpu_constructor,

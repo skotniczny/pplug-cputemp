@@ -1,5 +1,5 @@
 /*============================================================================
-Copyright (c) 2024 Raspberry Pi Holdings Ltd.
+Copyright (c) 2024 Raspberry Pi
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,24 +33,9 @@ extern "C" {
     WayfireWidget *create () { return new WayfireCPUTemp; }
     void destroy (WayfireWidget *w) { delete w; }
 
-    static constexpr conf_table_t conf_table[7] = {
-        {CONF_COLOUR,   "foreground",   N_("Foreground colour")},
-        {CONF_COLOUR,   "background",   N_("Background colour")},
-        {CONF_COLOUR,   "throttle_1",   N_("Colour when ARM frequency capped")},
-        {CONF_COLOUR,   "throttle_2",   N_("Colour when throttled")},
-        {CONF_INT,      "low_temp",     N_("Lower temperature bound")},
-        {CONF_INT,      "high_temp",    N_("Upper temperature bound")},
-        {CONF_NONE,     NULL,           NULL}
-    };
     const conf_table_t *config_params (void) { return conf_table; };
-    const char *display_name (void) { return N_("CPU Temp"); };
+    const char *display_name (void) { return N_(PLUGIN_TITLE); };
     const char *package_name (void) { return GETTEXT_PACKAGE; };
-}
-
-void WayfireCPUTemp::bar_pos_changed_cb (void)
-{
-    if ((std::string) bar_pos == "bottom") cput->bottom = TRUE;
-    else cput->bottom = FALSE;
 }
 
 void WayfireCPUTemp::icon_size_changed_cb (void)
@@ -94,7 +79,6 @@ void WayfireCPUTemp::init (Gtk::HBox *container)
     cput->plugin = (GtkWidget *)((*plugin).gobj());
     cput->icon_size = icon_size;
     icon_timer = Glib::signal_idle().connect (sigc::mem_fun (*this, &WayfireCPUTemp::set_icon));
-    bar_pos_changed_cb ();
 
     /* Add long press for right click */
     gesture = add_longpress_default (*plugin);
@@ -104,7 +88,6 @@ void WayfireCPUTemp::init (Gtk::HBox *container)
 
     /* Setup callbacks */
     icon_size.set_callback (sigc::mem_fun (*this, &WayfireCPUTemp::icon_size_changed_cb));
-    bar_pos.set_callback (sigc::mem_fun (*this, &WayfireCPUTemp::bar_pos_changed_cb));
 
     foreground_colour.set_callback (sigc::mem_fun (*this, &WayfireCPUTemp::settings_changed_cb));
     background_colour.set_callback (sigc::mem_fun (*this, &WayfireCPUTemp::settings_changed_cb));

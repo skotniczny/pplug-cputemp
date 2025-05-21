@@ -1,5 +1,5 @@
 /*============================================================================
-Copyright (c) 2018-2025 Raspberry Pi Holdings Ltd.
+Copyright (c) 2018-2025 Raspberry Pi
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Typedefs and macros                                                        */
 /*----------------------------------------------------------------------------*/
 
+#define PLUGIN_TITLE "CPU Temperature"
+
 #define MAX_NUM_SENSORS 10
 
 typedef gint (*GetTempFunc) (char const *);
@@ -42,7 +44,6 @@ typedef struct
     config_setting_t *settings;             /* Plugin settings */
 #else
     int icon_size;                          /* Variables used under wf-panel */
-    gboolean bottom;
 #endif
 
     PluginGraph graph;
@@ -59,6 +60,8 @@ typedef struct
     GdkRGBA low_throttle_colour;            /* Colour for bars with ARM freq cap */
     GdkRGBA high_throttle_colour;           /* Colour for bars with throttling */
 } CPUTempPlugin;
+
+extern conf_table_t conf_table[7];
 
 /*----------------------------------------------------------------------------*/
 /* Prototypes                                                                 */
