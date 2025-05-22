@@ -38,19 +38,13 @@ extern "C" {
     const char *package_name (void) { return GETTEXT_PACKAGE; };
 }
 
-void WayfireCPUTemp::icon_size_changed_cb (void)
-{
-    cput->icon_size = icon_size;
-    cputemp_update_display (cput);
-}
-
 bool WayfireCPUTemp::set_icon (void)
 {
     cputemp_update_display (cput);
     return false;
 }
 
-void WayfireCPUTemp::settings_changed_cb (void)
+void WayfireCPUTemp::read_settings (void)
 {
     if (!gdk_rgba_parse (&cput->foreground_colour, ((std::string) foreground_colour).c_str()))
         gdk_rgba_parse (&cput->foreground_colour, "dark gray");
@@ -63,7 +57,11 @@ void WayfireCPUTemp::settings_changed_cb (void)
 
     cput->lower_temp = low_temp;
     cput->upper_temp = high_temp;
+}
 
+void WayfireCPUTemp::settings_changed_cb (void)
+{
+    read_settings ();
     cputemp_update_display (cput);
 }
 
@@ -77,26 +75,22 @@ void WayfireCPUTemp::init (Gtk::HBox *container)
     /* Setup structure */
     cput = g_new0 (CPUTempPlugin, 1);
     cput->plugin = (GtkWidget *)((*plugin).gobj());
-    cput->icon_size = icon_size;
     icon_timer = Glib::signal_idle().connect (sigc::mem_fun (*this, &WayfireCPUTemp::set_icon));
 
     /* Add long press for right click */
     gesture = add_longpress_default (*plugin);
 
     /* Initialise the plugin */
+    read_settings ();
     cputemp_init (cput);
 
     /* Setup callbacks */
-    icon_size.set_callback (sigc::mem_fun (*this, &WayfireCPUTemp::icon_size_changed_cb));
-
     foreground_colour.set_callback (sigc::mem_fun (*this, &WayfireCPUTemp::settings_changed_cb));
     background_colour.set_callback (sigc::mem_fun (*this, &WayfireCPUTemp::settings_changed_cb));
     throttle1_colour.set_callback (sigc::mem_fun (*this, &WayfireCPUTemp::settings_changed_cb));
     throttle2_colour.set_callback (sigc::mem_fun (*this, &WayfireCPUTemp::settings_changed_cb));
     low_temp.set_callback (sigc::mem_fun (*this, &WayfireCPUTemp::settings_changed_cb));
     high_temp.set_callback (sigc::mem_fun (*this, &WayfireCPUTemp::settings_changed_cb));
-
-    settings_changed_cb ();
 }
 
 WayfireCPUTemp::~WayfireCPUTemp()
