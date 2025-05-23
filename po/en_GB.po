@@ -1,14 +1,14 @@
-# English translations for wf-panel-pi package.
-# Copyright (C) 2024 Raspberry Pi Ltd
+# English translations for plugin package.
+# Copyright (C) 2025 Raspberry Pi
 # This file is distributed under the same license as the wf-panel-pi package.
-# Simon Long <simon@raspberrypi.com>, 2024.
+# Simon Long <simon@raspberrypi.com>, 2025.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-20 07:46+0000\n"
-"PO-Revision-Date: 2017-03-06 14:18+0000\n"
+"POT-Creation-Date: 2025-05-23 10:36+0100\n"
+"PO-Revision-Date: 2025-05-23 10:36+0100\n"
 "Last-Translator: Simon Long <simon@raspberrypi.com>\n"
 "Language-Team: English (British)\n"
 "Language: en_GB\n"
@@ -17,42 +17,34 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../src/cputemp.c:502
-msgid "CPU Temperature"
-msgstr "CPU Temperature"
-
-#: ../src/cputemp.c:504 ../src/cputemp.cpp:36
+#: ../src/cputemp.c:71
 msgid "Foreground colour"
-msgstr "Foreground colour"
+msgstr "Foreground Colour"
 
-#: ../src/cputemp.c:505 ../src/cputemp.cpp:37
+#: ../src/cputemp.c:72
 msgid "Background colour"
-msgstr "Background colour"
+msgstr "Background Colour"
 
-#: ../src/cputemp.c:506 ../src/cputemp.cpp:38
+#: ../src/cputemp.c:73
 msgid "Colour when ARM frequency capped"
-msgstr "Colour when ARM frequency capped"
+msgstr "Colour when ARM Frequency Capped"
 
-#: ../src/cputemp.c:507 ../src/cputemp.cpp:39
+#: ../src/cputemp.c:74
 msgid "Colour when throttled"
-msgstr "Colour when throttled"
+msgstr "Colour when Throttled"
 
-#: ../src/cputemp.c:508 ../src/cputemp.cpp:40
+#: ../src/cputemp.c:75
 msgid "Lower temperature bound"
-msgstr "Lower temperature bound"
+msgstr "Lower Temperature Bound"
 
-#: ../src/cputemp.c:509 ../src/cputemp.cpp:41
+#: ../src/cputemp.c:76
 msgid "Upper temperature bound"
-msgstr "Upper temperature bound"
+msgstr "Upper Temperature Bound"
 
-#: ../src/cputemp.c:517
-msgid "CPU Temperature Monitor"
-msgstr "CPU Temperature Monitor"
-
-#: ../src/cputemp.c:519
+#: ../src/cputemp.c:533
 msgid "Display CPU temperature"
 msgstr "Display CPU temperature"
 
-#: ../src/cputemp.cpp:45
-msgid "CPU Temp"
-msgstr "CPU Temp"
+#: ../src/cputemp.h:32
+msgid "CPU Temperature"
+msgstr "CPU Temperature"
