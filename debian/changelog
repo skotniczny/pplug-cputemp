@@ -1,3 +1,9 @@
+pplug-cputemp (0.15) trixie; urgency=medium
+
+  * Modify for lxpanel-pi
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 27 May 2025 07:33:10 +0100
+
 pplug-cputemp (0.14) bookworm; urgency=medium
 
   * Use parent is_pi function
