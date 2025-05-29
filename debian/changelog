@@ -1,4 +1,4 @@
-pplug-cputemp (0.15) trixie; urgency=medium
+pplug-cputemp (1.0) trixie; urgency=medium
 
   * Modify for lxpanel-pi
 
