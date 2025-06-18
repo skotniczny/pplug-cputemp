@@ -10,12 +10,12 @@ Build-Depends:
 Standards-Version: 4.5.1
 Homepage: http://raspberrypi.com/
 
-Package: lxplug-cputemp
+Package: lpplug-cputemp
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends},
  lxpanel-pi
-Description: CPU temperature plugin for lxpanel
- Plugin for lxpanel to show graph of CPU temperature.
+Description: CPU temperature plugin for lxpanel-pi
+ Plugin for lxpanel-pi to show graph of CPU temperature.
 
 Package: wfplug-cputemp
 Architecture: any
